@@ -1,0 +1,14 @@
+# Stage 1: build binary Go
+FROM golang:1.26.1-alpine AS builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN go build -o server ./cmd/server/
+
+# Stage 2: image final yang ringan
+FROM alpine:latest
+WORKDIR /app
+COPY --from=builder /app/server .
+EXPOSE 8080
+CMD ["./server"]
